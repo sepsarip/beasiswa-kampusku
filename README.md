@@ -7,51 +7,84 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## About Laravel
+## Beasiswa Kampusku (Online)
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Aplikasi sederhana pendaftaran beasiswa online dengan 3 menu:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Pilihan Beasiswa**: informasi jenis beasiswa + syarat.
+- **Daftar**: form pendaftaran (validasi email, nomor HP angka, semester 1–8, upload berkas).
+- **Hasil**: menampilkan semua data pendaftaran + `status_ajuan`.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Catatan Penting (Data Temporari)
 
-## Learning Laravel
+- **Tidak menggunakan database**. Data pendaftaran disimpan sementara di **session**.
+- Jika browser ditutup / session habis, data hasil dapat hilang.
+- Berkas upload disimpan di `storage/app/public/beasiswa`.
+- Akses berkas pada halaman **Hasil** menggunakan route download (`/berkas/{id}`), sehingga tidak bergantung pada `public/storage`.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Aturan Form
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- IPK **tidak diinput** user: otomatis dari sistem (konstanta konfigurasi).
+- Jika **IPK < 3.0**: pilihan beasiswa, upload berkas, dan tombol daftar **dinonaktifkan**.
+- Jika **IPK >= 3.0**: kursor otomatis fokus ke pilihan beasiswa.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+IPK demo pada halaman **Daftar** dibuat bergantian (urut): 3.4 lalu 2.9 lalu 3.4, dst.
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+Nilai IPK dapat diubah lewat beasiswa config or env:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+BEASISWA_DEMO_IPK_1=3.4
+BEASISWA_DEMO_IPK_2=2.9
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### kode Inti
 
-## Contributing
+- `config/beasiswa.php` (konstanta IPK demo & daftar beasiswa)
+- `app/Http/Controllers/BeasiswaController.php` (alur Pilihan/Daftar/Hasil, session + upload)
+- `resources/views/layouts/app.blade.php` (layout + menu tab)
+- `resources/views/beasiswa/*.blade.php` (pilihan, daftar, hasil)
+- `resources/js/app.js` (aktif/pasif komponen + auto-focus)
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Cara Menjalankan (Windows)
 
-## Code of Conduct
+1. Install dependency:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+composer install
+npm install
+```
 
-## Security Vulnerabilities
+2. Siapkan env dan app key:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+copy .env.example .env
+php artisan key:generate
+```
+
+3. Jalankan aplikasi:
+
+```bash
+npm run dev
+php artisan serve
+```
+
+atau
+
+```bash
+composer run dev
+```
+
+4. Buka:
+
+- `/beasiswa` (Pilihan)
+- `/daftar` (Form)
+- `/hasil` (Hasil)
+
+### Running vs Debugging vs Build
+
+- **Running**: menjalankan aplikasi (contoh: `php artisan serve`, `npm run dev`).
+- **Debugging**: menjalankan dengan alat debug (contoh: Xdebug + breakpoints di IDE, melihat request lifecycle).
+- **Build**: membuat aset siap produksi (contoh: `npm run build` untuk Vite).
 
 ## License
 
